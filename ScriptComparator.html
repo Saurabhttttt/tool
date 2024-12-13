@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,6 +48,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            margin-right: 10px;
         }
 
         button:hover {
@@ -68,6 +68,11 @@
             background-color: yellow;
             font-weight: bold;
         }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+        }
     </style>
 </head>
 <body>
@@ -76,36 +81,50 @@
     <div class="container">
         <textarea id="scriptOne" placeholder="Enter Script One"></textarea>
         <textarea id="scriptTwo" placeholder="Enter Script Two"></textarea>
-        <button onclick="compareScripts()">Compare Scripts</button>
+        <div class="controls">
+            <button onclick="compareScripts()" aria-label="Compare Scripts">Compare</button>
+            <button onclick="resetForm()" aria-label="Reset Fields">Reset</button>
+        </div>
         <div id="result" class="result"></div>
     </div>
 
     <script>
         function compareScripts() {
-            const scriptOne = document.getElementById('scriptOne').value;
-            const scriptTwo = document.getElementById('scriptTwo').value;
+            const scriptOne = document.getElementById('scriptOne').value.trim();
+            const scriptTwo = document.getElementById('scriptTwo').value.trim();
 
-            const wordsOne = scriptOne.split(' ');
-            const wordsTwo = scriptTwo.split(' ');
+            if (!scriptOne || !scriptTwo) {
+                document.getElementById('result').innerHTML = '<span class="highlight">Please enter text in both fields.</span>';
+                return;
+            }
+
+            const wordsOne = scriptOne.split(/\s+/);
+            const wordsTwo = scriptTwo.split(/\s+/);
 
             const maxLength = Math.max(wordsOne.length, wordsTwo.length);
-            let result = '';
+            let result = [];
 
             for (let i = 0; i < maxLength; i++) {
                 if (i < wordsOne.length && i < wordsTwo.length) {
                     if (wordsOne[i] === wordsTwo[i]) {
-                        result += wordsOne[i] + ' ';
+                        result.push(wordsOne[i]);
                     } else {
-                        result += `<span class='highlight'>[${wordsOne[i]} -> ${wordsTwo[i]}]</span> `;
+                        result.push(`<span class='highlight'>[${wordsOne[i]} -> ${wordsTwo[i]}]</span>`);
                     }
                 } else if (i < wordsOne.length) {
-                    result += `<span class='highlight'>[${wordsOne[i]} -> (missing)]</span> `;
+                    result.push(`<span class='highlight'>[${wordsOne[i]} -> (missing)]</span>`);
                 } else {
-                    result += `<span class='highlight'>[(missing) -> ${wordsTwo[i]}]</span> `;
+                    result.push(`<span class='highlight'>[(missing) -> ${wordsTwo[i]}]</span>`);
                 }
             }
 
-            document.getElementById('result').innerHTML = result.trim();
+            document.getElementById('result').innerHTML = result.join(' ');
+        }
+
+        function resetForm() {
+            document.getElementById('scriptOne').value = '';
+            document.getElementById('scriptTwo').value = '';
+            document.getElementById('result').innerHTML = '';
         }
     </script>
 
